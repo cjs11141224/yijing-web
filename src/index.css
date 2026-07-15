@@ -1,0 +1,230 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   国风主题 · 对应小程序 app.wxss，并在其基础上做整体国风化
+   主色：金 #d4a843 / 暖白 #faf8f0 / 墨黑 #1a1a2e
+   国风点缀：朱砂 #b03a2e / 黛青 #2c5f6f / 竹青 #5d8a66 / 赭石 #c08a3e
+   ============================================================ */
+
+@layer base {
+  :root {
+    /* shadcn 语义变量 → 国风映射 */
+    --background: 48 50% 96%;            /* warm-white #faf8f0 */
+    --foreground: 240 28% 14%;           /* ink-black #1a1a2e */
+    --card: 0 0% 100%;
+    --card-foreground: 240 28% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 28% 14%;
+    --primary: 42 63% 55%;               /* gold #d4a843 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 45 29% 95%;             /* warm-gray */
+    --secondary-foreground: 240 28% 14%;
+    --muted: 45 29% 95%;
+    --muted-foreground: 0 0% 60%;        /* mid-gray #999 */
+    --accent: 45 57% 86%;                /* gold-light #f0e6c8 */
+    --accent-foreground: 42 63% 35%;     /* 深金 */
+    --destructive: 6 78% 57%;            /* error-red #e74c3c */
+    --destructive-foreground: 0 0% 98%;
+    --border: 43 20% 90%;
+    --input: 43 20% 90%;
+    --ring: 42 63% 55%;
+    --radius: 0.75rem;                   /* 对应 24rpx 卡片圆角 */
+
+    /* 易学专用变量（直接色值，供自定义组件用） */
+    --ink-black: #1a1a2e;
+    --gold: #d4a843;
+    --gold-light: #f0e6c8;
+    --warm-white: #faf8f0;
+    --warm-gray: #f5f3ed;
+    --mid-gray: #999999;
+    --light-gray: #cccccc;
+    --correct-green: #2ecc71;
+    --error-red: #e74c3c;
+    --progress-blue: #3498db;
+
+    --sidebar-background: 45 29% 95%;
+    --sidebar-foreground: 240 28% 14%;
+    --sidebar-primary: 42 63% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 45 57% 86%;
+    --sidebar-accent-foreground: 42 63% 35%;
+    --sidebar-border: 43 20% 90%;
+    --sidebar-ring: 42 63% 55%;
+
+    /* 国风传统色 */
+    --c-vermilion: #b03a2e;          /* 朱砂 */
+    --c-vermilion-light: #c84a4a;
+    --c-daiqing: #2c5f6f;            /* 黛青 */
+    --c-bamboo: #5d8a66;             /* 竹青 */
+    --c-ochre: #c08a3e;              /* 赭石 */
+    --c-indigo: #34495e;             /* 黛蓝 */
+    --c-rouge: #9b2d3a;              /* 胭脂 */
+    --c-moon: #f7f3e8;               /* 月白 */
+    --ink-grad: linear-gradient(160deg, #221f33 0%, #1a1a2e 100%);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html, body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    /* 宣纸晕染：细噪声 + 金/朱砂光晕 + 暖色渐变 */
+    min-height: 100vh;
+    background-color: #ece3cf;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
+      radial-gradient(circle at 18% 12%, rgba(212,168,67,0.10) 0%, rgba(212,168,67,0) 42%),
+      radial-gradient(circle at 82% 88%, rgba(176,58,46,0.07) 0%, rgba(176,58,46,0) 45%),
+      linear-gradient(135deg, #f4ecd8 0%, #ece3cd 55%, #f3ead6 100%);
+    background-attachment: fixed;
+  }
+  #root {
+    min-height: 100vh;
+    position: relative;
+  }
+}
+
+/* ============================================================
+   字体工具类 · 对应 app.wxss .title-serif / .original-text
+   ============================================================ */
+@layer components {
+  .title-serif {
+    font-family: "STSong", "Songti SC", "SimSun", "Source Han Serif SC", serif;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .original-text {
+    font-family: "STKaiti", "Kaiti SC", "KaiTi", "Source Han Serif SC", serif;
+    color: var(--ink-black);
+    border-left: 3px solid var(--gold);
+    padding-left: 12px;
+    margin: 12px 0;
+    line-height: 1.8;
+  }
+  /* 卦符号 */
+  .hex-symbol {
+    font-family: "Songti SC", "STSong", serif;
+  }
+
+  /* 宣纸质感卡片（白底微暖 + 描金柔边） */
+  .yi-card {
+    background: linear-gradient(150deg, rgba(255,255,255,0.94) 0%, rgba(250,248,240,0.90) 100%);
+    border: 1px solid rgba(212,168,67,0.28);
+    box-shadow: 0 2px 10px rgba(26,26,46,0.06);
+  }
+  /* 墨色卡片 */
+  .ink-card {
+    background: linear-gradient(150deg, #3d3852 0%, #2e2940 100%);
+    border: 1px solid rgba(212,168,67,0.28);
+  }
+  /* 朱砂印章 */
+  .seal-badge {
+    background: var(--c-vermilion);
+    color: #fff;
+    border-radius: 6px;
+    font-family: "STKaiti", "Kaiti SC", serif;
+    box-shadow: 0 1px 5px rgba(176,58,46,0.45);
+    letter-spacing: 0.05em;
+  }
+  /* 云纹分隔线 */
+  .cloud-divider {
+    height: 12px;
+    background-image: repeating-linear-gradient(90deg, rgba(212,168,67,0.55) 0 5px, transparent 5px 13px);
+    -webkit-mask: radial-gradient(5px 5px at 6px 6px, transparent 4px, #000 4px);
+    mask: radial-gradient(5px 5px at 6px 6px, transparent 4px, #000 4px);
+    opacity: 0.55;
+  }
+  /* 卦格描金 */
+  .hex-cell {
+    border: 1px solid rgba(212,168,67,0.25);
+  }
+  /* 描金细边块 */
+  .gold-frame {
+    border: 1px solid rgba(212,168,67,0.3);
+  }
+}
+
+/* ============================================================
+   滚动条美化
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 168, 67, 0.3);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 隐藏横向滚动条（卦象横滑用） */
+.scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ============================================================
+   动画
+   ============================================================ */
+@keyframes fadeIn {
+  from { opacity:0; transform: translateY(8px); }
+  to { opacity:1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 1.2s linear infinite;
+}
+
+/* 卡牌翻转 */
+.card-3d {
+  perspective: 1000px;
+}
+.card-3d-inner {
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  position: relative;
+}
+.card-3d.flipped .card-3d-inner {
+  transform: rotateY(180deg);
+}
+.card-3d-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.card-3d-back {
+  transform: rotateY(180deg);
+  position: absolute;
+  inset: 0;
+}

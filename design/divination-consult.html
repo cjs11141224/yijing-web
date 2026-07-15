@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI 解卦咨询 · UI 设计稿 v1</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{
+    --ink:#2a2a3a;
+    --gold:#c8a45c;
+    --gold-deep:#a8853f;
+    --gold-light:#f4ecd8;
+    --cinnabar:#b03a2e;
+    --paper:#f6efe0;
+    --paper-2:#efe6d2;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#d9d2c2;
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,serif;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .serif{font-family:"Songti SC","STSong","SimSun",serif;}
+  /* 宣纸纹理 */
+  .paper-bg{
+    background-color:var(--paper);
+    background-image:
+      radial-gradient(circle at 20% 15%, rgba(200,164,92,0.06) 0, transparent 40%),
+      radial-gradient(circle at 80% 85%, rgba(176,58,46,0.05) 0, transparent 45%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+  /* 爻线 */
+  .yao{display:flex;gap:6px;height:9px;width:54px;align-items:center;justify-content:center;}
+  .yao-yang{height:9px;width:54px;background:var(--ink);border-radius:2px;}
+  .yao-yin .seg{flex:1;height:9px;background:var(--ink);border-radius:2px;}
+  .yao-row{display:flex;align-items:center;gap:10px;}
+  .yao-row .pos{font-size:11px;color:var(--gold-deep);width:14px;text-align:center;opacity:.8;}
+  /* 朱砂印章 */
+  .seal{
+    display:inline-flex;align-items:center;justify-content:center;
+    background:var(--cinnabar);color:#fff;border-radius:6px;
+    font-size:12px;letter-spacing:1px;padding:2px 6px;
+    box-shadow:0 1px 3px rgba(176,58,46,.4);
+  }
+  .bubble-user{align-self:flex-end;background:linear-gradient(135deg,#3d3852,#2a2a3a);color:#f6efe0;border-radius:18px 18px 4px 18px;}
+  .card-ai{background:#fffdf7;border:1px solid var(--gold-light);border-radius:18px 18px 18px 4px;box-shadow:0 4px 18px rgba(120,90,40,.08);}
+  .chip{transition:all .15s;}
+  .chip.active{background:var(--gold);color:#fff;border-color:var(--gold);}
+  .chip:not(.active){background:rgba(200,164,92,.1);color:var(--gold-deep);border:1px solid rgba(200,164,92,.35);}
+  .scroll-area{scrollbar-width:thin;}
+  .scroll-area::-webkit-scrollbar{width:5px;}
+  .scroll-area::-webkit-scrollbar-thumb{background:rgba(200,164,92,.4);border-radius:4px;}
+  .tag{background:var(--gold-light);color:var(--gold-deep);border-radius:6px;padding:1px 7px;font-size:11px;}
+  .typing span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold);margin:0 2px;animation:blink 1.2s infinite both;}
+  .typing span:nth-child(2){animation-delay:.2s;}
+  .typing span:nth-child(3){animation-delay:.4s;}
+  @keyframes blink{0%,80%,100%{opacity:.2;}40%{opacity:1;}}
+</style>
+</head>
+<body class="min-h-screen flex items-center justify-center py-8">
+
+  <!-- 手机外框 -->
+  <div class="relative w-[390px] h-[844px] bg-black rounded-[44px] p-2.5 shadow-2xl">
+    <div class="paper-bg w-full h-full rounded-[34px] overflow-hidden flex flex-col relative">
+
+      <!-- 状态栏占位 -->
+      <div class="h-11 flex items-center justify-between px-6 text-[13px] text-ink/70">
+        <span>9:41</span>
+        <span class="flex gap-1.5"><span class="w-4 h-2.5 border border-ink/40 rounded-sm"></span><span class="w-5 h-2.5 border border-ink/40 rounded-sm"></span></span>
+      </div>
+
+      <!-- 顶栏 -->
+      <div class="flex items-center gap-2 px-4 h-12 border-b border-gold-light/70">
+        <button class="w-8 h-8 -ml-1 flex items-center justify-center text-ink/70 text-xl">‹</button>
+        <div class="flex-1 text-center">
+          <div class="serif text-[17px] text-ink">AI 解卦咨询</div>
+          <div class="text-[10px] text-gold-deep">易友 · 紫微道人</div>
+        </div>
+        <button class="w-8 h-8 flex items-center justify-center text-ink/60">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        </button>
+        <button class="w-8 h-8 flex items-center justify-center text-ink/60">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0Z"/><path d="M12 7v5l3 2"/></svg>
+        </button>
+      </div>
+
+      <!-- 对话区 -->
+      <div class="flex-1 overflow-y-auto scroll-area px-4 py-4 space-y-4">
+
+        <!-- 时间起卦信息条 -->
+        <div class="text-center text-[11px] text-ink/40">今天 15:43 · 时间起卦（乙巳年 癸未月）</div>
+
+        <!-- 用户问事 -->
+        <div class="flex flex-col gap-2">
+          <div class="bubble-user px-4 py-2.5 text-[14px] max-w-[78%] leading-relaxed">
+            我最近在考虑要不要换工作，机会不错但也有风险，能帮我起一卦看看吗？
+          </div>
+        </div>
+
+        <!-- AI 起卦中 -->
+        <div class="card-ai px-4 py-3 max-w-[85%] flex items-center gap-2 text-[13px] text-ink/60">
+          <span class="typing"><span></span><span></span><span></span></span>
+          正在为您起卦…
+        </div>
+
+        <!-- AI 解卦结果卡 -->
+        <div class="card-ai px-4 py-4 max-w-[92%] space-y-3">
+          <!-- 卦头 -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-3xl serif text-gold-deep">䷖</span>
+              <div>
+                <div class="serif text-[16px] text-ink">山地剥 · 剥卦</div>
+                <div class="text-[11px] text-ink/50">第 23 卦 · 下坤上艮</div>
+              </div>
+            </div>
+            <span class="seal">上上卦</span>
+          </div>
+
+          <!-- 卦象六爻（初爻在下） -->
+          <div class="flex justify-center py-1">
+            <div class="flex flex-col-reverse gap-1.5 bg-paper-2/60 rounded-xl px-4 py-3">
+              <!-- 上爻 阳 -->
+              <div class="yao-row"><span class="pos">上</span><div class="yao-yang"></div></div>
+              <!-- 五 阴 -->
+              <div class="yao-row"><span class="pos">五</span><div class="yao yao-yin"><div class="seg"></div><div class="seg"></div></div></div>
+              <!-- 四 阴 -->
+              <div class="yao-row"><span class="pos">四</span><div class="yao yao-yin"><div class="seg"></div><div class="seg"></div></div></div>
+              <!-- 三 阴 -->
+              <div class="yao-row"><span class="pos">三</span><div class="yao yao-yin"><div class="seg"></div><div class="seg"></div></div></div>
+              <!-- 二 阴 -->
+              <div class="yao-row"><span class="pos">二</span><div class="yao yao-yin"><div class="seg"></div><div class="seg"></div></div></div>
+              <!-- 初 阴 -->
+              <div class="yao-row"><span class="pos">初</span><div class="yao yao-yin"><div class="seg"></div><div class="seg"></div></div></div>
+            </div>
+          </div>
+
+          <!-- 卦辞 -->
+          <div class="bg-gold-light/40 rounded-lg px-3 py-2">
+            <div class="text-[11px] text-gold-deep mb-0.5">卦辞</div>
+            <div class="text-[13px] leading-relaxed text-ink/85 serif">剥，不利有攸往。</div>
+          </div>
+
+          <!-- 白话解读 -->
+          <div class="space-y-2">
+            <div class="text-[11px] text-gold-deep">白话解读</div>
+            <div class="text-[13px] leading-relaxed text-ink/80">
+              剥卦为五阴剥一阳之象，意为<span class="text-cinnabar font-medium">剥落、消退、守成为上</span>。当下大势不利大举变动，宜稳守、清理、等待时机。
+            </div>
+            <div class="grid grid-cols-1 gap-1.5 mt-1">
+              <div class="flex gap-2 text-[12.5px]"><span class="tag shrink-0">事业</span><span class="text-ink/75">不宜贸然跳槽；若现岗位尚可，建议沉淀积累，待阳气来复。</span></div>
+              <div class="flex gap-2 text-[12.5px]"><span class="tag shrink-0">风险</span><span class="text-ink/75">新机会看似美好，但时机未到，强动易遇阻碍。</span></div>
+              <div class="flex gap-2 text-[12.5px]"><span class="tag shrink-0">建议</span><span class="text-ink/75">可先做准备、暗中布局，三个月后再做决定。</span></div>
+            </div>
+          </div>
+
+          <!-- 操作行 -->
+          <div class="flex items-center gap-3 pt-1 text-[12px] text-ink/55">
+            <button class="flex items-center gap-1 hover:text-gold-deep"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>收藏</button>
+            <button class="flex items-center gap-1 hover:text-gold-deep"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>分享</button>
+            <button class="flex items-center gap-1 hover:text-gold-deep"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>追问</button>
+          </div>
+        </div>
+
+        <!-- 用户追问 -->
+        <div class="flex flex-col gap-2">
+          <div class="bubble-user px-4 py-2.5 text-[14px] max-w-[78%] leading-relaxed">
+            那如果我先不动、继续观望，这个月内会有变化吗？
+          </div>
+        </div>
+
+        <!-- AI 补充 -->
+        <div class="card-ai px-4 py-3.5 max-w-[88%] space-y-1.5">
+          <div class="text-[13px] leading-relaxed text-ink/80">
+            剥卦五阴在下，阳气仅存上爻，<span class="text-cinnabar font-medium">本月仍以"守"为主</span>。但上九一阳未绝，说明：
+          </div>
+          <div class="text-[13px] leading-relaxed text-ink/80">· 中旬或有贵人/内部转机出现，留意身边资深同事。<br/>· 真正的转折大概率在<span class="text-gold-deep font-medium">农历八月后</span>。</div>
+          <div class="text-[12px] text-ink/50 pt-1">— 以上为 AI 基于卦象的参考，重大决策请结合自身判断。</div>
+        </div>
+
+        <!-- 真人解卦师轻入口 -->
+        <div class="mx-auto mt-1 w-fit">
+          <button class="flex items-center gap-2 rounded-full border border-gold/50 bg-white/70 px-3.5 py-1.5 text-[12px] text-gold-deep hover:bg-gold-light/50">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            想听真人解卦师解读？
+          </button>
+        </div>
+
+      </div>
+
+      <!-- 输入区 -->
+      <div class="border-t border-gold-light/70 bg-paper/95 px-3 pt-2.5 pb-3 space-y-2">
+        <!-- 起卦方式 -->
+        <div class="flex gap-2">
+          <button class="chip active rounded-full px-3 py-1.5 text-[12px]">⏱ 时间起卦</button>
+          <button class="chip rounded-full px-3 py-1.5 text-[12px]">🎲 随机起卦</button>
+          <button class="chip rounded-full px-3 py-1.5 text-[12px]">✋ 手动摇卦</button>
+        </div>
+        <!-- 输入框 -->
+        <div class="flex items-end gap-2 bg-white rounded-2xl border border-gold-light px-3 py-2 shadow-sm">
+          <textarea rows="1" class="flex-1 resize-none text-[14px] text-ink outline-none bg-transparent leading-relaxed max-h-24" placeholder="请描述你所求问的事，越具体越准…"></textarea>
+          <button class="shrink-0 w-9 h-9 rounded-full bg-gold text-white flex items-center justify-center active:scale-95 transition">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </button>
+        </div>
+        <div class="text-[10px] text-ink/35 text-center">本服务由 AI 生成，仅供娱乐与参考，不构成专业建议</div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

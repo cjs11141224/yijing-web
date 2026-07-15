@@ -1,0 +1,17 @@
+{
+  "name": "yijing-web-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "易学 Web 端账号后端（Express + JWT）",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

@@ -1,0 +1,15 @@
+# Render.com 部署配置（免费版）
+# 部署后访问分配的 *.onrender.com，账号系统全功能可用（前端 + 后端同进程）。
+# 构建：npm install && npm run build（产出 dist）；启动：npm start（node server 同时托管前端与 /api）。
+services:
+  - type: web
+    name: yijing-web
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: JWT_SECRET
+        generateValue: true

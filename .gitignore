@@ -1,0 +1,15 @@
+# 依赖
+node_modules
+
+# 构建产物（Render 会自动 npm run build 生成）
+dist
+
+# 运行时数据（首次启动自动 seed，无需入库）
+server/data
+
+# 本地备份（含完整项目副本，体积大）
+backups
+
+# 日志
+*.log
+npm-debug.log*

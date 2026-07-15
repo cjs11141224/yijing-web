@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>解卦咨询 · UI 设计 v2</title>
+<style>
+  :root{
+    --paper:#f3ecdb;
+    --paper-2:#ece2cc;
+    --ink:#1f1c2e;
+    --ink-2:#2a2640;
+    --ink-soft:#4a4566;
+    --zhusha:#b03a2e;
+    --gold:#c9a25a;
+    --gold-2:#e0c585;
+    --dai:#2c5f6f;
+    --zhu:#6b8e5a;
+    --line:rgba(31,28,46,.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+    background:#e7ddc7;
+    color:var(--ink);
+    min-height:100vh;
+    padding:28px 16px 60px;
+    display:flex;flex-direction:column;align-items:center;
+  }
+  .topbar{width:100%;max-width:920px;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px}
+  .topbar h1{font-size:18px;letter-spacing:1px;display:flex;align-items:center;gap:8px}
+  .seal{width:26px;height:26px;border-radius:6px;background:var(--zhusha);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;box-shadow:0 1px 0 rgba(0,0,0,.2)}
+  .toggle{display:flex;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px}
+  .toggle button{border:0;background:transparent;padding:7px 16px;border-radius:999px;font-size:13px;color:var(--ink-soft);cursor:pointer;font-family:inherit}
+  .toggle button.on{background:var(--ink);color:#fff}
+  .note{width:100%;max-width:920px;background:#fff8; border:1px dashed var(--gold);border-radius:12px;padding:12px 14px;font-size:12.5px;color:var(--ink-soft);line-height:1.7;margin-bottom:18px}
+  .note b{color:var(--zhusha)}
+
+  /* ===== Desktop layout ===== */
+  .desktop{display:none;width:100%;max-width:920px;height:640px;background:var(--paper);border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.22);border:1px solid var(--line)}
+  .desktop.on{display:flex}
+  .sidebar{width:210px;background:linear-gradient(180deg,#221f33,#1a1a2e);color:#e9e4d6;padding:20px 14px;display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+  .logo{display:flex;align-items:center;gap:8px;margin-bottom:22px;padding-left:6px}
+  .logo .seal{width:30px;height:30px;font-size:14px}
+  .logo span{font-size:15px;letter-spacing:2px;color:var(--gold-2)}
+  .navitem{padding:10px 12px;border-radius:10px;font-size:13.5px;color:#c9c3d6;display:flex;align-items:center;gap:9px;cursor:pointer}
+  .navitem.active{background:rgba(201,162,90,.16);color:#fff;box-shadow:inset 0 0 0 1px rgba(201,162,90,.4)}
+  .navitem .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.6}
+  .side-foot{margin-top:auto;font-size:11px;color:#7c7790;padding-left:8px}
+  .main{flex:1;display:flex;flex-direction:column;min-width:0}
+
+  /* ===== Mobile layout ===== */
+  .mobile{display:none;width:390px;height:780px;background:var(--paper);border-radius:38px;padding:12px;box-shadow:0 24px 70px rgba(0,0,0,.3);border:8px solid #15131f;position:relative;overflow:hidden}
+  .mobile.on{display:block}
+
+  /* shared chat area */
+  .chat{flex:1;overflow-y:auto;padding:14px 14px 6px;display:flex;flex-direction:column;gap:14px;background:
+    radial-gradient(circle at 20% 10%, rgba(201,162,90,.10), transparent 40%),
+    radial-gradient(circle at 80% 90%, rgba(176,58,46,.06), transparent 45%),
+    var(--paper);
+  }
+  .chat::-webkit-scrollbar{width:0}
+  .bartime{text-align:center;font-size:11px;color:var(--ink-soft);opacity:.7}
+  .bubble-row{display:flex;gap:8px;align-items:flex-end}
+  .bubble-row.me{flex-direction:row-reverse}
+  .avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:14px;background:var(--dai);color:#fff}
+  .avatar.ai{background:linear-gradient(135deg,var(--zhusha),#8c2c22)}
+  .bubble{max-width:74%;padding:10px 13px;border-radius:14px;font-size:13.5px;line-height:1.6}
+  .bubble.me{background:var(--ink);color:#f3ecdb;border-bottom-right-radius:4px}
+  .bubble.ai{background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px}
+  .typing{display:flex;gap:4px;padding:12px 14px}
+  .typing span{width:6px;height:6px;border-radius:50%;background:var(--ink-soft);opacity:.5;animation:blink 1.2s infinite}
+  .typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+
+  /* ===== Result card ===== */
+  .result{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 6px 22px rgba(31,28,46,.1);border:1px solid var(--line)}
+  .result-head{background:linear-gradient(135deg,#2a2640,#1f1c2e);color:#f3ecdb;padding:14px 16px;display:flex;align-items:center;gap:14px}
+  .hex-sym{display:flex;flex-direction:column-reverse;gap:3px}
+  .hex-sym .yao{height:7px;border-radius:2px;background:var(--gold-2)}
+  .hex-sym .yao.broken{background:transparent;position:relative}
+  .hex-sym .yao.broken::before,.hex-sym .yao.broken::after{content:"";position:absolute;top:0;height:7px;width:42%;background:var(--gold-2);border-radius:2px}
+  .hex-sym .yao.broken::before{left:0}.hex-sym .yao.broken::after{right:0}
+  .result-title{flex:1}
+  .result-title .name{font-size:19px;font-weight:700;letter-spacing:1px}
+  .result-title .sub{font-size:11.5px;color:#c9c3d6;margin-top:2px}
+  .stamp{width:42px;height:42px;border:2px solid var(--zhusha);border-radius:8px;color:var(--zhusha);display:grid;place-items:center;font-size:12px;line-height:1.1;text-align:center;font-weight:700;transform:rotate(-6deg);flex-shrink:0}
+  .result-body{padding:14px 16px}
+  .orig{font-size:12.5px;color:var(--dai);background:#f6f1e3;border-left:3px solid var(--gold);padding:8px 10px;border-radius:6px;margin-bottom:10px;line-height:1.6}
+  .orig b{color:var(--zhusha)}
+  .plain{font-size:13.5px;line-height:1.7;color:var(--ink)}
+  .dims{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .dim{display:flex;gap:9px;font-size:12.5px;line-height:1.55}
+  .dim .tag{flex-shrink:0;width:46px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:11px;color:#fff;font-weight:600}
+  .tag.career{background:var(--dai)}.tag.risk{background:var(--zhusha)}.tag.tip{background:var(--zhu)}
+  .paywall{margin-top:14px;border:1px dashed var(--gold);border-radius:12px;padding:12px;background:#fbf6ea;text-align:center}
+  .paywall .pt{font-size:13px;color:var(--ink-soft);margin-bottom:8px;line-height:1.5}
+  .paywall .pt b{color:var(--zhusha)}
+  .pay-btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--zhusha),#8c2c22);color:#fff;border:0;padding:9px 22px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit}
+  .human{margin-top:10px;display:flex;align-items:center;gap:8px;justify-content:center;font-size:12px;color:var(--ink-soft);background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px;cursor:pointer}
+  .human .h{color:var(--dai);font-weight:600}
+
+  /* ===== Input bar ===== */
+  .inputbar{border-top:1px solid var(--line);background:#fff;padding:10px 12px 12px}
+  .methods{display:flex;gap:7px;margin-bottom:9px}
+  .method{flex:1;border:1px solid var(--line);background:#faf6ec;border-radius:10px;padding:7px 4px;text-align:center;font-size:12px;color:var(--ink-soft);cursor:pointer;transition:.15s}
+  .method .ico{font-size:16px;display:block;margin-bottom:2px}
+  .method.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .input-row{display:flex;gap:8px;align-items:flex-end}
+  .input-row textarea{flex:1;resize:none;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13.5px;font-family:inherit;background:#faf6ec;line-height:1.5;max-height:90px}
+  .send{width:42px;height:42px;border-radius:50%;background:var(--zhusha);color:#fff;border:0;font-size:18px;cursor:pointer;flex-shrink:0;display:grid;place-items:center}
+  .disclaim{font-size:10.5px;color:var(--ink-soft);opacity:.65;text-align:center;margin-top:8px;line-height:1.4}
+
+  /* ===== overlay (paywall demo) ===== */
+  .overlay{position:absolute;inset:0;background:rgba(20,18,30,.5);display:none;align-items:center;justify-content:center;z-index:9;padding:24px}
+  .overlay.on{display:flex}
+  .sheet{background:#fff;border-radius:16px;padding:20px;width:100%;max-width:300px;text-align:center}
+  .sheet h3{font-size:16px;margin-bottom:6px}
+  .sheet p{font-size:12.5px;color:var(--ink-soft);line-height:1.6;margin-bottom:16px}
+  .sheet .row{display:flex;gap:10px}
+  .sheet button{flex:1;border:0;padding:11px;border-radius:10px;font-size:13.5px;cursor:pointer;font-family:inherit;font-weight:600}
+  .sheet .cancel{background:#f0ece0;color:var(--ink-soft)}
+  .sheet .ok{background:var(--zhusha);color:#fff}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <h1><span class="seal">易</span> 解卦咨询 · UI 设计 v2</h1>
+    <div class="toggle">
+      <button id="t-mobile" class="on" onclick="switchView('mobile')">手机视图</button>
+      <button id="t-desktop" onclick="switchView('desktop')">桌面视图</button>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>v2 默认决策（供讨论，可接受 / 推翻）：</b>
+    ① 布局用<b>手机框聚焦对话</b>（桌面视图仅示意，沿用项目 Sidebar）；
+    ② 起卦方式<b>三选一</b>（时间默认），手动摇卦做成可点 6 下的轻交互；
+    ③ 结果卡<b>原文折叠 + 白话展开</b>，默认仅看白话、点「看原文」展开；
+    ④ 真人解卦师为<b>轻占位入口</b>，不抢 AI 主流程；
+    ⑤ 付费墙：<b>基础解读免费，深度解读 ¥12</b> 在结果卡内嵌按钮触发。
+  </div>
+
+  <!-- ===== Desktop ===== -->
+  <div class="desktop" id="desktop">
+    <div class="sidebar">
+      <div class="logo"><span class="seal">易</span><span>易知</span></div>
+      <div class="navitem"><span class="dot"></span>首页</div>
+      <div class="navitem"><span class="dot"></span>学习</div>
+      <div class="navitem active"><span class="dot"></span>解卦咨询</div>
+      <div class="navitem"><span class="dot"></span>易友社区</div>
+      <div class="navitem"><span class="dot"></span>内容市场</div>
+      <div class="navitem"><span class="dot"></span>问答</div>
+      <div class="navitem"><span class="dot"></span>我的</div>
+      <div class="side-foot">v2.4 · 周易学习</div>
+    </div>
+    <div class="main">
+      <div class="chat" id="chat-d">
+        <!-- chat content injected by JS to avoid duplication -->
+      </div>
+      <div class="inputbar">
+        <div class="methods" id="methods-d"></div>
+        <div class="input-row">
+          <textarea rows="1" placeholder="想问什么？如：最近事业该不该变动…"></textarea>
+          <button class="send" onclick="demoSend()">↑</button>
+        </div>
+        <div class="disclaim">本结果为传统文化推演，仅供娱乐与思考参考，不构成任何决策建议</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Mobile ===== -->
+  <div class="mobile on" id="mobile">
+    <div class="chat" id="chat-m"></div>
+    <div class="inputbar">
+      <div class="methods" id="methods-m"></div>
+      <div class="input-row">
+        <textarea rows="1" placeholder="想问什么？如：最近事业该不该变动…"></textarea>
+        <button class="send" onclick="demoSend()">↑</button>
+      </div>
+      <div class="disclaim">本结果为传统文化推演，仅供娱乐与思考参考，不构成决策建议</div>
+    </div>
+    <div class="overlay" id="overlay">
+      <div class="sheet">
+        <h3>解锁深度解读</h3>
+        <p>含卦象全维度解析、应期建议、变爻推演与个性化行动指南。</p>
+        <p style="color:var(--zhusha);font-weight:700;font-size:15px">¥12.00</p>
+        <div class="row">
+          <button class="cancel" onclick="closePay()">暂不需要</button>
+          <button class="ok" onclick="closePay()">立即解锁</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const CHAT_HTML = `
+    <div class="bartime">2026-07-14 15:48 · 时间起卦</div>
+    <div class="bubble-row me">
+      <div class="avatar">我</div>
+      <div class="bubble me">最近在考虑要不要换工作，想请先生给些指引。</div>
+    </div>
+    <div class="bubble-row ai">
+      <div class="avatar ai">易</div>
+      <div class="bubble ai"><div class="typing"><span></span><span></span><span></span></div></div>
+    </div>
+    <div class="bubble-row ai">
+      <div class="avatar ai">易</div>
+      <div class="bubble ai" style="padding:0;background:transparent;border:0">
+        <div class="result">
+          <div class="result-head">
+            <div class="hex-sym">
+              <div class="yao"></div><div class="yao broken"></div><div class="yao broken"></div>
+              <div class="yao broken"></div><div class="yao"></div><div class="yao broken"></div>
+            </div>
+            <div class="result-title">
+              <div class="name">蒙卦 · 山水蒙</div>
+              <div class="sub">第四卦 · 下坎上艮</div>
+            </div>
+            <div class="stamp">中下<br>卦</div>
+          </div>
+          <div class="result-body">
+            <div class="orig" id="orig" style="display:none"><b>卦辞：</b>蒙，亨。匪我求童蒙，童蒙求我。初筮告，再三渎，渎则不告。利贞。</div>
+            <div class="plain">此卦如蒙童初学，宜谦逊求教、循序渐进。换工作之事，时机未到<b>明处</b>，宜先沉淀能力、广纳良言，切勿冒进。</div>
+            <div class="dims">
+              <div class="dim"><span class="tag career">事业</span><span>当前宜守不宜攻。先在本岗积累可见成果，待秋冬之机再谋变动更有把握。</span></div>
+              <div class="dim"><span class="tag risk">风险</span><span>急于跳槽易陷入「蒙而不明」，新环境信息差大，需防被表面机会误导。</span></div>
+              <div class="dim"><span class="tag tip">建议</span><span>主动找一位可信前辈请教（童蒙求我），用 1 个月做能力+人脉双储备。</span></div>
+            </div>
+            <div class="paywall">
+              <div class="pt">以上为基础解读。<b>深度解读</b>含变爻推演、应期与个性化行动清单。</div>
+              <button class="pay-btn" onclick="openPay()">解锁深度解读 · ¥12</button>
+            </div>
+            <div class="human" onclick="alert('跳转至真人解卦师列表（占位）')">🙋 想听真人解卦师解读？<span class="h">去预约 ›</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bubble-row me">
+      <div class="avatar">我</div>
+      <div class="bubble me">那如果留在现岗，今年有晋升机会吗？</div>
+    </div>
+    <div class="bubble-row ai">
+      <div class="avatar ai">易</div>
+      <div class="bubble ai">蒙卦九二「包蒙吉」，得师长提携之象。今年确有被看见的机会，关键在「主动展示过程」而非只等结果。</div>
+    </div>
+  `;
+
+  const METHODS = [
+    {ico:'⏱', label:'时间', key:'time'},
+    {ico:'🎲', label:'随机', key:'random'},
+    {ico:'✋', label:'手动', key:'manual'},
+  ];
+  function renderMethods(el){
+    el.innerHTML = METHODS.map((m,i)=>
+      `<div class="method ${i===0?'on':''}" onclick="pickMethod(this)"><span class="ico">${m.ico}</span>${m.label}</div>`
+    ).join('');
+  }
+  function pickMethod(el){
+    el.parentElement.querySelectorAll('.method').forEach(x=>x.classList.remove('on'));
+    el.classList.add('on');
+  }
+  function switchView(v){
+    document.getElementById('mobile').classList.toggle('on', v==='mobile');
+    document.getElementById('desktop').classList.toggle('on', v==='desktop');
+    document.getElementById('t-mobile').classList.toggle('on', v==='mobile');
+    document.getElementById('t-desktop').classList.toggle('on', v==='desktop');
+  }
+  function openPay(){document.getElementById('overlay').classList.add('on')}
+  function closePay(){document.getElementById('overlay').classList.remove('on')}
+  function demoSend(){
+    const ta=document.querySelector('.mobile.on textarea, .desktop.on textarea');
+    if(ta&&ta.value.trim()){alert('演示：发送后将调用后端起卦+AI 解读（生产环境接口）')}
+  }
+  // init
+  document.getElementById('chat-m').innerHTML = CHAT_HTML;
+  document.getElementById('chat-d').innerHTML = CHAT_HTML;
+  renderMethods(document.getElementById('methods-m'));
+  renderMethods(document.getElementById('methods-d'));
+</script>
+</body>
+</html>

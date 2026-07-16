@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Sparkles, UserPlus, LogIn } from 'lucide-react'
+import { UserPlus, LogIn } from 'lucide-react'
 import { toast } from 'sonner'
 import { useStore } from '@/store/useStore'
 import { useSession } from '@/store/useSession'
@@ -77,9 +77,11 @@ export default function Login() {
       <div className="relative w-full max-w-xs">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-yiji-gold to-[#b8881d] flex items-center justify-center mb-4 shadow-card">
-            <Sparkles size={36} className="text-white" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="易学"
+            className="w-20 h-20 mx-auto rounded-3xl mb-4 shadow-card object-cover ring-1 ring-[rgba(212,168,67,0.3)]"
+          />
           <h1 className="title-serif text-2xl">易学</h1>
           <p className="text-xs text-muted-foreground mt-1">游戏化学习易经智慧</p>
         </div>

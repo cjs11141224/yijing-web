@@ -34,9 +34,11 @@ export default function Sidebar() {
     <aside className="hidden lg:flex flex-col fixed inset-y-0 left-0 w-60 z-40 bg-[linear-gradient(160deg,#221f33_0%,#1a1a2e_100%)] border-r border-[rgba(212,168,67,0.25)]">
       {/* Logo：朱砂印章 + 题名 */}
       <div className="h-16 flex items-center gap-2.5 px-5 border-b border-[rgba(212,168,67,0.18)] shrink-0">
-        <div className="w-9 h-9 rounded-md bg-[#b03a2e] flex items-center justify-center text-white title-serif text-xl shadow-[0_2px_8px_rgba(176,58,46,0.5)]">
-          易
-        </div>
+        <img
+          src="/logo.png"
+          alt="易学"
+          className="w-9 h-9 rounded-md object-cover ring-1 ring-[rgba(212,168,67,0.35)]"
+        />
         <div className="leading-tight">
           <div className="title-serif text-xl text-yiji-gold">易学</div>
           <div className="text-[9px] text-white/35 tracking-widest">易经 · 游戏化修习</div>

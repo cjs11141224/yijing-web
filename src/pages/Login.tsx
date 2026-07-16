@@ -74,10 +74,6 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-8 relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 hex-symbol text-[200px] text-yiji-gold/5 select-none">䷀</div>
-      </div>
-
       <div className="relative w-full max-w-xs">
         {/* Logo */}
         <div className="text-center mb-8">
